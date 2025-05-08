@@ -19,7 +19,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/components/ui/use-toast';
 import axios, { AxiosError } from 'axios';
-import { Loader2 } from 'lucide-react';
+import { Loader2, UserPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { signUpSchema } from '@/schemas/signUpSchema';
 
@@ -98,16 +98,25 @@ export default function SignUpForm() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-800">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
+    <div className="relative flex justify-center items-center min-h-screen">
+      {/* Background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-accent/5 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3"></div>
+      </div>
+      
+      <div className="w-full max-w-md p-8 space-y-6 subtle-card card-hover rounded-lg shadow-lg relative z-10">
         <div className="text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl mb-6">
+          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <UserPlus className="h-8 w-8 text-primary" />
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight mb-2">
             Join Mystery Message
           </h1>
-          <p className="mb-4">Sign up to start your anonymous adventure</p>
+          <p className="text-muted-foreground mb-6">Sign up to start your anonymous adventure</p>
         </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               name="username"
               control={form.control}
@@ -121,10 +130,10 @@ export default function SignUpForm() {
                       setUsername(e.target.value);
                     }}
                   />
-                  {isCheckingUsername && <Loader2 className="animate-spin" />}
+                  {isCheckingUsername && <Loader2 className="h-4 w-4 animate-spin mt-2" />}
                   {!isCheckingUsername && usernameMessage && (
                     <p
-                      className={`text-sm ${
+                      className={`text-sm mt-1 ${
                         usernameMessage === 'Username is unique'
                           ? 'text-green-500'
                           : 'text-red-500'
@@ -144,7 +153,7 @@ export default function SignUpForm() {
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <Input {...field} name="email" />
-                  <p className='text-muted text-gray-400 text-sm'>We will send you a verification code</p>
+                  <p className='text-muted-foreground text-sm mt-1'>We will send you a verification code</p>
                   <FormMessage />
                 </FormItem>
               )}
@@ -161,7 +170,7 @@ export default function SignUpForm() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className='w-full' disabled={isSubmitting}>
+            <Button type="submit" className='w-full mt-2' disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -174,9 +183,9 @@ export default function SignUpForm() {
           </form>
         </Form>
         <div className="text-center mt-4">
-          <p>
+          <p className="text-muted-foreground">
             Already a member?{' '}
-            <Link href="/sign-in" className="text-blue-600 hover:text-blue-800">
+            <Link href="/sign-in" className="text-primary hover:text-primary/90 underline underline-offset-4">
               Sign in
             </Link>
           </p>

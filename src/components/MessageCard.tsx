@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import axios, { AxiosError } from 'axios';
 import dayjs from 'dayjs';
-import { Shield, X } from 'lucide-react';
+import { Shield, Trash2, Calendar, Clock } from 'lucide-react';
 import { Message } from '@/model/User';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import {
@@ -20,6 +20,7 @@ import {
 import { Button } from './ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { ApiResponse } from '@/types/ApiResponse';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 type MessageCardProps = {
   message: Message;
@@ -29,8 +30,13 @@ type MessageCardProps = {
 export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
   const { toast } = useToast();
   const [isBlockLoading, setIsBlockLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  const formattedDate = dayjs(message.createdAt).format('MMM D, YYYY');
+  const formattedTime = dayjs(message.createdAt).format('h:mm A');
 
   const handleDeleteConfirm = async () => {
+    setIsDeleting(true);
     try {
       const response = await axios.delete<ApiResponse>(
         `/api/delete-message/${message._id}`
@@ -48,7 +54,9 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
           axiosError.response?.data.message ?? 'Failed to delete message',
         variant: 'destructive',
       });
-    } 
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleBlockIP = async () => {
@@ -85,67 +93,96 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
   };
 
   return (
-    <Card className="card-bordered">
-      <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle>{message.content}</CardTitle>
-          <div className="flex space-x-2">
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant='outline' className="bg-orange-100 hover:bg-orange-200 border-orange-300" title="Block sender">
-                  <Shield className="w-5 h-5" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Block this sender?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This will block the IP address ({message.senderIP || 'unknown'}) of this message sender. 
-                    They will not be able to send you new messages.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>
-                    Cancel
-                  </AlertDialogCancel>
-                  <AlertDialogAction onClick={handleBlockIP} disabled={isBlockLoading}>
-                    {isBlockLoading ? 'Blocking...' : 'Block Sender'}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-            
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant='destructive'>
-                  <X className="w-5 h-5" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    this message.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>
-                    Cancel
-                  </AlertDialogCancel>
-                  <AlertDialogAction onClick={handleDeleteConfirm}>
-                    Continue
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
-        </div>
-        <div className="text-sm">
-          {dayjs(message.createdAt).format('MMM D, YYYY h:mm A')}
+    <Card className="card-hover overflow-hidden border border-border/60">
+      <CardHeader className="pb-2">
+        <div className="flex justify-between">
+          <CardTitle className="line-clamp-1 text-base sm:text-lg font-medium">
+            Anonymous Message
+          </CardTitle>
+          <TooltipProvider>
+            <div className="flex space-x-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="icon" className="text-amber-500 hover:text-amber-600 hover:bg-amber-50 h-8 w-8">
+                        <Shield className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Block this sender?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This will block the IP address ({message.senderIP || 'unknown'}) of this message sender. 
+                          They will not be able to send you new messages.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>
+                          Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction onClick={handleBlockIP} disabled={isBlockLoading}>
+                          {isBlockLoading ? 'Blocking...' : 'Block Sender'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Block sender</p>
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-red-500 hover:text-red-600 hover:bg-red-50 h-8 w-8"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete this message?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete
+                          this message.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>
+                          Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteConfirm} disabled={isDeleting}>
+                          {isDeleting ? 'Deleting...' : 'Delete'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Delete message</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </TooltipProvider>
         </div>
       </CardHeader>
-      <CardContent></CardContent>
+      
+      <CardContent>
+        <p className="text-sm sm:text-base mb-3">{message.content}</p>
+        <div className="flex items-center text-xs text-muted-foreground">
+          <Calendar className="h-3 w-3 mr-1" />
+          <span>{formattedDate}</span>
+          <span className="mx-2">•</span>
+          <Clock className="h-3 w-3 mr-1" />
+          <span>{formattedTime}</span>
+        </div>
+      </CardContent>
     </Card>
   );
 }

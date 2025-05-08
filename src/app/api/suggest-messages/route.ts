@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
   // Ask Google Generative AI for a streaming completion given the prompt
   const response = await genAI
-    .getGenerativeModel({ model: 'gemini-1.5-flash' })
+    .getGenerativeModel({ model: 'gemini-2.0-flash' })
     .generateContentStream({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
     });

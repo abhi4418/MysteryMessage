@@ -111,7 +111,7 @@ export default function BlockedIPs() {
   }, [session]);
 
   return (
-    <div className="my-8 mx-4 md:mx-8 lg:mx-auto p-6 bg-white rounded w-full max-w-6xl">
+    <div className="my-8 mx-4 md:mx-8 lg:mx-auto p-6 bg-card rounded w-full max-w-6xl">
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
         <h1 className="text-3xl font-bold">Blocked IP Addresses</h1>
         <div className="flex flex-wrap gap-2">
@@ -169,19 +169,19 @@ export default function BlockedIPs() {
       </div>
 
       <div className="my-4">
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           IP addresses that have been blocked will not be able to send you messages.
         </p>
       </div>
 
       {blockedIPs.length === 0 ? (
-        <div className="text-center py-10 bg-gray-50 rounded">
-          <p className="text-gray-500">No IP addresses have been blocked.</p>
+        <div className="text-center py-10 bg-muted rounded">
+          <p className="text-muted-foreground">No IP addresses have been blocked.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {blockedIPs.map((ip) => (
-            <Card key={ip} className="border border-gray-200">
+            <Card key={ip} className="border border-border">
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-center">
                   <CardTitle className="text-lg">{ip}</CardTitle>
@@ -190,7 +190,7 @@ export default function BlockedIPs() {
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -216,7 +216,7 @@ export default function BlockedIPs() {
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
-                <p className="text-sm text-gray-500">Blocked from sending messages</p>
+                <p className="text-sm text-muted-foreground">Blocked from sending messages</p>
               </CardContent>
             </Card>
           ))}

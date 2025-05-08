@@ -9,7 +9,7 @@ import { Message } from '@/model/User';
 import { ApiResponse } from '@/types/ApiResponse';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios, { AxiosError } from 'axios';
-import { Loader2, RefreshCcw, Trash2 } from 'lucide-react';
+import { Loader2, RefreshCcw, Trash2, Copy, MessageCircle, Bell, BellOff } from 'lucide-react';
 import { User } from 'next-auth';
 import { useSession } from 'next-auth/react';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -26,6 +26,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 
 function UserDashboard() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -169,99 +171,157 @@ function UserDashboard() {
   };
 
   return (
-    <div className="my-8 mx-4 md:mx-8 lg:mx-auto p-6 bg-white rounded w-full max-w-6xl">
-      <h1 className="text-4xl font-bold mb-4">User Dashboard</h1>
+    <div className="relative min-h-screen py-10">
+      {/* Background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-1/2 h-1/2 bg-accent/5 rounded-full blur-3xl translate-y-1/3 -translate-x-1/3"></div>
+      </div>
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <header className="mb-10 text-center">
+          <h1 className="text-3xl md:text-4xl font-bold mb-3">Welcome, {username}</h1>
+          <p className="text-muted-foreground">Manage your messages and profile settings</p>
+        </header>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Profile Link Card */}
+          <Card className="subtle-card card-hover lg:col-span-2">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl">Your Anonymous Message Link</CardTitle>
+              <CardDescription>Share this link to receive anonymous messages</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center mt-2">
+                <Input
+                  type="text"
+                  value={profileUrl}
+                  readOnly
+                  className="font-mono text-sm"
+                />
+                <Button onClick={copyToClipboard} className="ml-2" size="icon" variant="outline">
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
 
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold mb-2">Copy Your Unique Link</h2>{' '}
-        <div className="flex items-center">
-          <input
-            type="text"
-            value={profileUrl}
-            disabled
-            className="input input-bordered w-full p-2 mr-2"
-          />
-          <Button onClick={copyToClipboard}>Copy</Button>
+          {/* Message Settings Card */}
+          <Card className="subtle-card card-hover">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xl">Message Settings</CardTitle>
+              <CardDescription>Control who can message you</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center space-x-2">
+                  {acceptMessages ? 
+                    <Bell className="h-5 w-5 text-primary" /> : 
+                    <BellOff className="h-5 w-5 text-muted-foreground" />
+                  }
+                  <span>Accept Messages</span>
+                </div>
+                <Switch
+                  {...register('acceptMessages')}
+                  checked={acceptMessages}
+                  onCheckedChange={handleSwitchChange}
+                  disabled={isSwitchLoading}
+                />
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      </div>
 
-      <div className="mb-4">
-        <Switch
-          {...register('acceptMessages')}
-          checked={acceptMessages}
-          onCheckedChange={handleSwitchChange}
-          disabled={isSwitchLoading}
-        />
-        <span className="ml-2">
-          Accept Messages: {acceptMessages ? 'On' : 'Off'}
-        </span>
-      </div>
-      <Separator />
-
-      <div className="flex flex-wrap gap-2 mt-4 items-center">
-        <Button
-          variant="outline"
-          onClick={(e) => {
-            e.preventDefault();
-            fetchMessages(true);
-          }}
-        >
-          {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-          ) : (
-            <RefreshCcw className="h-4 w-4 mr-2" />
-          )}
-          Refresh
-        </Button>
-
-        {messages.length > 0 && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button 
-                variant="destructive"
-                disabled={isDeletingAll}
+        {/* Messages Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <MessageCircle className="mr-2 h-5 w-5 text-primary" />
+              <h2 className="text-2xl font-semibold">Your Messages</h2>
+            </div>
+            
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                onClick={() => fetchMessages(true)}
+                disabled={isLoading}
+                size="sm"
               >
-                {isDeletingAll ? (
+                {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : (
-                  <Trash2 className="h-4 w-4 mr-2" />
+                  <RefreshCcw className="h-4 w-4 mr-2" />
                 )}
-                Delete All Messages
+                Refresh
               </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete all messages?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will permanently delete all your messages. This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction 
-                  onClick={handleDeleteAllMessages}
-                  disabled={isDeletingAll}
-                >
-                  {isDeletingAll ? 'Deleting...' : 'Delete All'}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
-      </div>
 
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-6">
-        {messages.length > 0 ? (
-          messages.map((message, index) => (
-            <MessageCard
-              key={message._id as string}
-              message={message}
-              onMessageDelete={handleDeleteMessage}
-            />
-          ))
-        ) : (
-          <p>No messages to display.</p>
-        )}
+              {messages.length > 0 && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button 
+                      variant="destructive"
+                      disabled={isDeletingAll}
+                      size="sm"
+                    >
+                      {isDeletingAll ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <Trash2 className="h-4 w-4 mr-2" />
+                      )}
+                      Delete All
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete all messages?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete all your messages. This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={handleDeleteAllMessages}
+                        disabled={isDeletingAll}
+                      >
+                        {isDeletingAll ? 'Deleting...' : 'Delete All'}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
+          </div>
+
+          <Separator className="mb-6" />
+
+          {messages.length === 0 ? (
+            <Card className="subtle-card border-dashed border">
+              <CardContent className="flex flex-col items-center justify-center py-16">
+                <div className="w-20 h-20 rounded-full bg-muted/20 flex items-center justify-center mb-4">
+                  <MessageCircle className="h-10 w-10 text-muted-foreground" />
+                </div>
+                <h3 className="text-xl font-medium mb-2">No messages yet</h3>
+                <p className="text-muted-foreground text-center max-w-md mb-6">
+                  Share your profile link with others to start receiving anonymous messages.
+                </p>
+                <Button onClick={copyToClipboard} size="sm" className="gap-2">
+                  <Copy className="h-4 w-4" /> Copy Profile Link
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {messages.map((message) => (
+                <MessageCard
+                  key={message._id as string}
+                  message={message}
+                  onMessageDelete={handleDeleteMessage}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
