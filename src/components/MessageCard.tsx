@@ -113,7 +113,7 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
                       <AlertDialogHeader>
                         <AlertDialogTitle>Block this sender?</AlertDialogTitle>
                         <AlertDialogDescription>
-                          This will block the IP address ({message.senderIP || 'unknown'}) of this message sender. 
+                          This will block the IP address ({message.senderIP || "unknown"}) of this message sender. 
                           They will not be able to send you new messages.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
@@ -122,7 +122,7 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
                           Cancel
                         </AlertDialogCancel>
                         <AlertDialogAction onClick={handleBlockIP} disabled={isBlockLoading}>
-                          {isBlockLoading ? 'Blocking...' : 'Block Sender'}
+                          {isBlockLoading ? "Blocking..." : "Block Sender"}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -158,7 +158,7 @@ export function MessageCard({ message, onMessageDelete }: MessageCardProps) {
                           Cancel
                         </AlertDialogCancel>
                         <AlertDialogAction onClick={handleDeleteConfirm} disabled={isDeleting}>
-                          {isDeleting ? 'Deleting...' : 'Delete'}
+                          {isDeleting ? "Deleting..." : "Delete"}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
