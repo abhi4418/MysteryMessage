@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios, { AxiosError } from 'axios';
 import { useSession } from 'next-auth/react';
 import { useToast } from '@/components/ui/use-toast';
@@ -28,7 +28,7 @@ export default function BlockedIPs() {
   const { data: session } = useSession();
   const { toast } = useToast();
 
-  const fetchBlockedIPs = async () => {
+  const fetchBlockedIPs = useCallback(async () => {
     if (!session?.user) return;
     
     setIsLoading(true);
@@ -47,7 +47,7 @@ export default function BlockedIPs() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [session, toast]);
 
   const handleUnblockIP = async (ipToUnblock: string) => {
     setUnblockingIP(ipToUnblock);
@@ -108,7 +108,7 @@ export default function BlockedIPs() {
     if (session?.user) {
       fetchBlockedIPs();
     }
-  }, [session]);
+  }, [session, fetchBlockedIPs]);
 
   return (
     <div className="my-8 mx-4 md:mx-8 lg:mx-auto p-6 bg-card rounded w-full max-w-6xl">
