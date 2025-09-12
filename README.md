@@ -43,18 +43,15 @@ A well-structured project with modern development practices.
 
 2. Install dependencies:
    ```bash
-   # Add specific installation commands based on your project
+   npm install
    ```
 
-3. Configure the project:
+3. Run the project:
    ```bash
-   # Add configuration steps
+   npm start
    ```
 
-4. Run the project:
-   ```bash
-   # Add run commands
-   ```
+> **Note**: This is a basic installation guide. Please refer to the project documentation for detailed setup instructions.
 
 ## 💻 Usage
 
@@ -62,9 +59,13 @@ A well-structured project with modern development practices.
 
 This project provides a solid foundation for development. Here are some common usage patterns:
 
-```bash
-# Basic usage example
-# Add specific usage examples based on your project
+```javascript
+// Import the module
+const myModule = require('./src/index');
+
+// Use the module
+const result = myModule.someFunction();
+console.log(result);
 ```
 
 For more detailed examples, please refer to the documentation or source code.
@@ -106,7 +107,7 @@ The project follows a well-organized structure with clear separation of concerns
 | 💻 Language | TypeScript |
 | 📦 Size | 144 KB |
 | 📅 Created | 10/2/2024 |
-| 🔄 Updated | 5/8/2025 |
+| 🔄 Updated | 9/12/2025 |
 
 ## 🤝 Contributing
 
